@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using DogGo.Repository;
 using DogGo.Repositories;
 
 namespace DogGo
@@ -26,6 +27,7 @@ namespace DogGo
         {
             services.AddControllersWithViews();
             services.AddTransient<IWalkerRepository, WalkerRepository>();
+            services.AddTransient<IOwnerRepository, OwnerRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
