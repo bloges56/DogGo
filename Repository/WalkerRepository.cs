@@ -146,5 +146,52 @@ namespace DogGo.Repositories
                 }
             }
         }
+
+        public List<Walks> GetWalksByWalkerId(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT w.Id, Date, Duration, WalkerId, DogId, o.Name
+                                        FROM Walks w
+                                        LEFT JOIN Dog d ON d.Id = DogId
+                                        LEFT JOIN Owner o ON o.Id = d.OwnerId
+                                        WHERE WalkerId = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Walks> walks = new List<Walks>() { };
+
+                    while (reader.Read())
+                    {
+                        Walks walk = new Walks()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Date = reader.GetDateTime(reader.GetOrdinal("Date")),
+                            Duration = reader.GetInt32(reader.GetOrdinal("Duration")),
+                            WalkerId = id,
+                            DogId = reader.GetInt32(reader.GetOrdinal("DogId")),
+                            Dog = new Dog()
+                            {
+                                Owner = new Owner()
+                                {
+                                    Name = reader.GetString(reader.GetOrdinal("Name"))
+                                }
+                            }
+                        };
+
+                        walks.Add(walk);
+                    }
+
+                    reader.Close();
+
+                    return walks;
+                }
+            }
+        }
     }
 }
