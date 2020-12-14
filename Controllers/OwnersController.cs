@@ -6,16 +6,22 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DogGo.Models;
 using DogGo.Repository;
+using DogGo.Repositories;
+using DogGo.Models.ViewModels;
 
 namespace DogGo.Controllers
 {
     public class OwnersController : Controller
     {
-        private readonly IOwnerRepository _ownerRepo;
+        private IOwnerRepository _ownerRepo;
+        private IDogRepository _dogRepo;
+        private IWalkerRepository _walkerRepo;
 
-        public OwnersController(IOwnerRepository ownerRepo)
+        public OwnersController(IOwnerRepository ownerRepo, IDogRepository dogRepo, IWalkerRepository walkerRepo)
         {
             _ownerRepo = ownerRepo;
+            _dogRepo = dogRepo;
+            _walkerRepo = walkerRepo;
         }
 
         // GET: Owners
@@ -29,7 +35,17 @@ namespace DogGo.Controllers
         public ActionResult Details(int id)
         {
             Owner owner = _ownerRepo.GetOwnerById(id);
-            return View(owner);
+            List<Dog> dogs = _dogRepo.GetDogsByOwnerId(owner.Id);
+            List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(owner.NeighborhoodId);
+
+            ProfileViewModel vm = new ProfileViewModel()
+            {
+                Owner = owner,
+                Dogs = dogs,
+                Walkers = walkers
+            };
+
+            return View(vm);
         }
 
         // GET: Owners/Create
