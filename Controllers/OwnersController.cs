@@ -6,16 +6,24 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using DogGo.Models;
 using DogGo.Repository;
+using DogGo.Repositories;
+using DogGo.Models.ViewModels;
 
 namespace DogGo.Controllers
 {
     public class OwnersController : Controller
     {
-        private readonly IOwnerRepository _ownerRepo;
+        private IOwnerRepository _ownerRepo;
+        private IDogRepository _dogRepo;
+        private IWalkerRepository _walkerRepo;
+        private INeighborhoodRepository _neighborhoodRepo;
 
-        public OwnersController(IOwnerRepository ownerRepo)
+        public OwnersController(IOwnerRepository ownerRepo, IDogRepository dogRepo, IWalkerRepository walkerRepo, INeighborhoodRepository neighborhoodrepo)
         {
             _ownerRepo = ownerRepo;
+            _dogRepo = dogRepo;
+            _walkerRepo = walkerRepo;
+            _neighborhoodRepo = neighborhoodrepo;
         }
 
         // GET: Owners
@@ -29,59 +37,78 @@ namespace DogGo.Controllers
         public ActionResult Details(int id)
         {
             Owner owner = _ownerRepo.GetOwnerById(id);
-            return View(owner);
+            List<Dog> dogs = _dogRepo.GetDogsByOwnerId(owner.Id);
+            List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(owner.NeighborhoodId);
+
+            ProfileViewModel vm = new ProfileViewModel()
+            {
+                Owner = owner,
+                Dogs = dogs,
+                Walkers = walkers
+            };
+
+            return View(vm);
         }
 
         // GET: Owners/Create
         public ActionResult Create()
         {
-            return View();
+            List<Neighborhood> neighborhoods = _neighborhoodRepo.GetAll();
+
+            OwnerFormViewModel vm = new OwnerFormViewModel()
+            {
+                Owner = new Owner(),
+                Neighborhoods = neighborhoods
+            };
+
+            return View(vm);
         }
 
         // POST: Owners/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Owner owner)
+        public ActionResult Create(OwnerFormViewModel ownerFormViewModel)
         {
             try
             {
-                _ownerRepo.AddOwner(owner);
+                _ownerRepo.AddOwner(ownerFormViewModel.Owner);
 
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return View(owner);
+                return View(ownerFormViewModel);
             }
         }
 
         // GET: Owners/Edit/5
         public ActionResult Edit(int id)
         {
-            Owner owner = _ownerRepo.GetOwnerById(id);
+            List<Neighborhood> neighborhoods = _neighborhoodRepo.GetAll();
 
-            if (owner == null)
+            OwnerFormViewModel vm = new OwnerFormViewModel()
             {
-                return NotFound();
-            }
+                Owner = new Owner(),
+                Neighborhoods = neighborhoods
+            };
 
-            return View(owner);
+            return View(vm);
         }
 
         // POST: Owners/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Owner owner)
+        public ActionResult Edit(int id, OwnerFormViewModel vm)
         {
             try
             {
-                _ownerRepo.UpdateOwner(owner);
+                _ownerRepo.UpdateOwner(vm.Owner);
 
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return View(owner);
+                return View(vm);
             }
         }
 
