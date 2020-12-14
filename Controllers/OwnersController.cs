@@ -16,12 +16,14 @@ namespace DogGo.Controllers
         private IOwnerRepository _ownerRepo;
         private IDogRepository _dogRepo;
         private IWalkerRepository _walkerRepo;
+        private INeighborhoodRepository _neighborhoodRepo;
 
-        public OwnersController(IOwnerRepository ownerRepo, IDogRepository dogRepo, IWalkerRepository walkerRepo)
+        public OwnersController(IOwnerRepository ownerRepo, IDogRepository dogRepo, IWalkerRepository walkerRepo, INeighborhoodRepository neighborhoodrepo)
         {
             _ownerRepo = ownerRepo;
             _dogRepo = dogRepo;
             _walkerRepo = walkerRepo;
+            _neighborhoodRepo = neighborhoodrepo;
         }
 
         // GET: Owners
@@ -51,7 +53,15 @@ namespace DogGo.Controllers
         // GET: Owners/Create
         public ActionResult Create()
         {
-            return View();
+            List<Neighborhood> neighborhoods = _neighborhoodRepo.GetAll();
+
+            OwnerFormViewModel vm = new OwnerFormViewModel()
+            {
+                Owner = new Owner(),
+                Neighborhoods = neighborhoods
+            };
+
+            return View(vm);
         }
 
         // POST: Owners/Create
