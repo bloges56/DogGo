@@ -48,7 +48,7 @@ namespace DogGo.Controllers
                 // TODO: Add insert logic here
                 _dogRepo.AddDog(dog);
                 return RedirectToAction(nameof(Index));
-        }
+            }
             catch
             {
                 return View(dog);
@@ -67,16 +67,16 @@ namespace DogGo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Dog dog)
         {
-            try
-            {
+            /*try
+            {*/
                 // TODO: Add update logic here
                 _dogRepo.UpdateDog(dog);
                 return RedirectToAction(nameof(Index));
-            }
+            /*}
             catch
             {
                 return View(dog);
-            }
+            }*/
         }
 
         // GET: Dogs/Delete/5
