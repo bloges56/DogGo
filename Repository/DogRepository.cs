@@ -164,14 +164,14 @@ namespace DogGo.Repository
 
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Dog (Name, OwnerId, Breed, Notes)
+                    cmd.CommandText = @"INSERT INTO Dog (Name, OwnerId, Breed, Notes, ImageUrl)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@name, @ownerId, @breed, @notes)";
+                                        VALUES (@name, @ownerId, @breed, @notes, @imageUrl)";
                     cmd.Parameters.AddWithValue("@name", dog.Name);
                     cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", dog.Breed);
-                    cmd.Parameters.AddWithValue("@notes", dog.Notes);
-                    
+                    cmd.Parameters.AddWithValue("@notes", Utils.ReaderUtils.GetNullableObject(dog.Notes));
+                    cmd.Parameters.AddWithValue("@imageUrl", Utils.ReaderUtils.GetNullableObject(dog.ImageUrl));
 
                     int id = (int)cmd.ExecuteScalar();
 
@@ -193,13 +193,15 @@ namespace DogGo.Repository
                                             Name = @name,
                                             OwnerId = @ownerId,
                                             Breed = @breed,
-                                            Notes = @notes
+                                            Notes = @notes,
+                                            ImageUrl = @imageUrl
                                         WHERE Id = @id";
                     cmd.Parameters.AddWithValue("@id", dog.Id);
                     cmd.Parameters.AddWithValue("@name", dog.Name);
                     cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", dog.Breed);
-                    cmd.Parameters.AddWithValue("@notes", dog.Notes);
+                    cmd.Parameters.AddWithValue("@notes", Utils.ReaderUtils.GetNullableObject(dog.Notes));
+                    cmd.Parameters.AddWithValue("@imageUrl", Utils.ReaderUtils.GetNullableObject(dog.ImageUrl));
 
                     cmd.ExecuteNonQuery();
 
