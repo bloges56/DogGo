@@ -67,6 +67,10 @@ namespace DogGo.Controllers
         public ActionResult Edit(int id)
         {
             Dog dog = _dogRepo.GetDogById(id);
+            if (dog.OwnerId != GetCurrentUserId())
+            {
+                return RedirectToAction(nameof(NotFound));
+            }
             return View(dog);
         }
 
@@ -75,22 +79,32 @@ namespace DogGo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Dog dog)
         {
-            /*try
-            {*/
-                // TODO: Add update logic here
-                _dogRepo.UpdateDog(dog);
-                return RedirectToAction(nameof(Index));
-            /*}
-            catch
+            if (dog.OwnerId == GetCurrentUserId())
             {
-                return View(dog);
-            }*/
+                try
+                {
+                    // TODO: Add update logic here
+                    _dogRepo.UpdateDog(dog);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    return View(dog);
+                }
+            }
+            return RedirectToAction(nameof(NotFound));
         }
 
         // GET: Dogs/Delete/5
         public ActionResult Delete(int id)
         {
             Dog dog = _dogRepo.GetDogById(id);
+
+            if (dog.OwnerId != GetCurrentUserId())
+            {
+                return RedirectToAction(nameof(NotFound));
+            }
+
             return View(dog);
         }
 
@@ -99,6 +113,10 @@ namespace DogGo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, Dog dog)
         {
+            if (dog.OwnerId != GetCurrentUserId())
+            {
+                return RedirectToAction(nameof(NotFound));
+            }
             try
             {
                 // TODO: Add delete logic here
