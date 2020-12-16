@@ -88,11 +88,11 @@ namespace DogGo.Controllers
 
             OwnerFormViewModel vm = new OwnerFormViewModel()
             {
-                Owner = new Owner(),
+                Owner = _ownerRepo.GetOwnerById(id),
                 Neighborhoods = neighborhoods
             };
 
-            return View(vm);
+            return View(vm); 
         }
 
         // POST: Owners/Edit/5
