@@ -33,10 +33,16 @@
             <div class="form-group">
                 <label asp-for="Owner.NeighborhoodId" class="control-label"></label>
                 <select asp-for="Owner.NeighborhoodId" class="form-control">
-                    <option value="">Select Neighborhood</option>
                     @foreach (Neighborhood neighborhood in Model.Neighborhoods)
                     {
-                        <option value="@neighborhood.Id">@neighborhood.Name</option>
+                        if (neighborhood.Id != Model.Owner.NeighborhoodId)
+                        {
+                            <option value="@neighborhood.Id">@neighborhood.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@neighborhood.Id" selected>@neighborhood.Name</option>
+                        }
                     }
                 </select>
                 <span asp-validation-for="Owner.NeighborhoodId" class="text-danger"></span>
