@@ -40,14 +40,13 @@
                         @{List<Walks> orderedWalks = Model.Walks.OrderBy(walk => walk.Dog.Owner.Name).ToList();
                             foreach (Walks walk in orderedWalks)
                             {
-
-                                string walkHours = $"{walk.Duration / 60}hr";
-                                string walkMinutes = $"{walk.Duration % 60}min";
+                                TimeSpan walkDuration = TimeSpan.FromSeconds(walk.Duration);
+                                string walkDurationString = $"{walkDuration.Hours}hr {walkDuration.Minutes}min";
 
                             <tr>
                                 <td>@walk.Date.ToString("M/dd/yyyy")</td>
                                 <td>@walk.Dog.Owner.Name</td>
-                                <td>@walkHours @walkMinutes</td>
+                                <td>@walkDurationString</td>
                             </tr>
                             }
                          }
@@ -58,14 +57,7 @@
 
         <section class="col-lg-4 col-md-8 container mt-5">
             @{
-                int totalMinutes = Model.Walks.Sum(walk => walk.Duration);
-                int totalHours = totalMinutes / 60;
-                int minutes = totalMinutes % 60;
-
-                string hours = $"{totalHours}hr";
-                string minutesStr = $"{minutes}min";
-
-                <h1>Total Walk Time: @hours @minutesStr</h1>
+                <h1>Total Walk Time: @Model.TotalDurationString</h1>
             }
         </section>
     </div>
