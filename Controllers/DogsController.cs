@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace DogGo.Controllers
 {
+    [Authorize]
     public class DogsController : Controller
     {
         private IDogRepository _dogRepo;
@@ -20,7 +21,6 @@ namespace DogGo.Controllers
             _dogRepo = dogRepo;
         }
         // GET: Dogs
-        [Authorize]
         public ActionResult Index()
         {
             int ownerId = GetCurrentUserId();
@@ -37,7 +37,6 @@ namespace DogGo.Controllers
             return View(dog);
         }
 
-        [Authorize]
         // GET: Dogs/Create
         public ActionResult Create()
         {
