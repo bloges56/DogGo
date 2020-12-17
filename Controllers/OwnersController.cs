@@ -11,6 +11,7 @@ using DogGo.Models.ViewModels;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DogGo.Controllers
 {
@@ -29,16 +30,22 @@ namespace DogGo.Controllers
             _neighborhoodRepo = neighborhoodrepo;
         }
 
+        [Authorize]
         // GET: Owners
         public ActionResult Index()
         {
-            List<Owner> owners = _ownerRepo.GetAllOwners();
-            return View(owners);
+            int userId = GetCurrentUserId();
+            return RedirectToAction("Details", new { id = userId });
         }
 
+        [Authorize]
         // GET: Owners/Details/5
         public ActionResult Details(int id)
         {
+            if(id != GetCurrentUserId())
+            {
+                return NotFound();
+            }
             Owner owner = _ownerRepo.GetOwnerById(id);
             List<Dog> dogs = _dogRepo.GetDogsByOwnerId(owner.Id);
             List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(owner.NeighborhoodId);
@@ -53,6 +60,7 @@ namespace DogGo.Controllers
             return View(vm);
         }
 
+        [Authorize]
         // GET: Owners/Create
         public ActionResult Create()
         {
@@ -67,6 +75,7 @@ namespace DogGo.Controllers
             return View(vm);
         }
 
+        [Authorize]
         // POST: Owners/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -84,6 +93,7 @@ namespace DogGo.Controllers
             }
         }
 
+        [Authorize]
         // GET: Owners/Edit/5
         public ActionResult Edit(int id)
         {
@@ -95,9 +105,10 @@ namespace DogGo.Controllers
                 Neighborhoods = neighborhoods
             };
 
-            return View(vm); 
+            return View(vm);
         }
 
+        [Authorize]
         // POST: Owners/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -115,6 +126,7 @@ namespace DogGo.Controllers
             }
         }
 
+        [Authorize]
         // GET: Owners/Delete/5
         public ActionResult Delete(int id)
         {
@@ -123,6 +135,7 @@ namespace DogGo.Controllers
             return View(owner);
         }
 
+        [Authorize]
         // POST: Owners/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -156,11 +169,11 @@ namespace DogGo.Controllers
             }
 
             List<Claim> claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, owner.Id.ToString()),
-        new Claim(ClaimTypes.Email, owner.Email),
-        new Claim(ClaimTypes.Role, "DogOwner"),
-    };
+            {
+                new Claim(ClaimTypes.NameIdentifier, owner.Id.ToString()),
+                new Claim(ClaimTypes.Email, owner.Email),
+                new Claim(ClaimTypes.Role, "DogOwner"),
+            };
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(
                 claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -169,7 +182,13 @@ namespace DogGo.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity));
 
-            return RedirectToAction("Index", "Dogs");
+            return RedirectToAction("Details", new { id = owner.Id });
+        }
+
+        private int GetCurrentUserId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id);
         }
     }
 }
