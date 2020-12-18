@@ -10,7 +10,6 @@ namespace DogGo.Models.ViewModels
     {
         public List<Dog> Dogs { get; set; }
 
-        [Required]
-        public DateTime WalkDate { get; set; }
+        public Walks Walk { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DogGo.Repository
 {
-    public class WalksRepository
+    public class WalksRepository : IWalksRepository
     {
         private readonly IConfiguration _config;
 
@@ -35,6 +35,7 @@ namespace DogGo.Repository
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"INSERT INTO Walks (Date, Duration, WalkerId, DogId, WalkStatusId)
+                                        OUTPUT INSERTED.Id
                                         VALUES (@date, @duration, @walkerId, @dogId, @walkStatusId)";
                     cmd.Parameters.AddWithValue("@date", walk.Date);
                     cmd.Parameters.AddWithValue("@walkerId", walk.WalkerId);
